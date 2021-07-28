@@ -32,7 +32,7 @@ app.use(
       secret: process.env.SESSION_SECRET,
       resave: true,
       saveUninitialized: true,
-      // cookie: { secure: true },
+      //cookie: { secure: true },
     })
   );
 
@@ -42,7 +42,7 @@ if (req.session.currentUser) {
     User.findById(req.session.currentUser._id)
     .then((userFromDb) => {
         res.locals.currentUser = userFromDb;
-        res.locals.isLoggedIn = true;
+        res.locals.isLoggedIn = {isIt:true};
         next();
         // res.locals.isAdmin = userFromDB.isAdmin
     })
@@ -51,7 +51,8 @@ if (req.session.currentUser) {
     });
 } else {
     res.locals.currentUser = undefined;
-    res.locals.isLoggedIn = false;
+    res.locals.isLoggedIn = {isIt:false};
+    console.log(res.locals.isLoggedIn);
     next();
 }
 });
@@ -68,7 +69,9 @@ if (req.session.currentUser) {
 const index = require('./routes/index');
 const authRoutes = require('./routes/auth.js');
 const userRoutes = require('./routes/users.js');
+const privateRoutes= require('./routes/protectedRoutes');
 app.use('/', index);
+app.use('/', privateRoutes);
 app.use('/',authRoutes);
 app.use('/',userRoutes);
 
