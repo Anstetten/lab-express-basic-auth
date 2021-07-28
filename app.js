@@ -42,7 +42,7 @@ if (req.session.currentUser) {
     User.findById(req.session.currentUser._id)
     .then((userFromDb) => {
         res.locals.currentUser = userFromDb;
-        res.locals.isLoggedIn = {isIt:true};
+        res.locals.isLoggedIn = true;
         next();
         // res.locals.isAdmin = userFromDB.isAdmin
     })
@@ -51,8 +51,8 @@ if (req.session.currentUser) {
     });
 } else {
     res.locals.currentUser = undefined;
-    res.locals.isLoggedIn = {isIt:false};
-    console.log(res.locals.isLoggedIn);
+    res.locals.isLoggedIn = false;
+
     next();
 }
 });
