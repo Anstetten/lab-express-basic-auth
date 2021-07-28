@@ -15,7 +15,7 @@ router.post('/signup', async (req, res, next)=>{
     const user = req.body;
     //Check if the user provided the rquired data, if no throw message
     if(!user.password || !user.username) {
-        res.render('auth/signUp.hbs', {errorMessage:'ERROR: Please provide an email and a password'});
+        res.render('auth/signUp.hbs', {errorMessage:'ERROR: Please provide both an email and a password'});
         return;
     }
     //Check if we can find a user already in our database with this name
@@ -44,6 +44,46 @@ router.post('/signup', async (req, res, next)=>{
 router.get('/signin', (req,res,next)=>{
     res.render('auth/signIn.hbs');
 });
+
+router.post('/signin', async (req,res,next)=>{
+
+    try{
+        const user = req.body;
+
+        if(!user.password || !user.username) {
+            res.render('auth/signIn.hbs', {errorMessage:'ERROR: Please provide both an email and a password'});
+            return;
+        }
+
+        const foundUser = await User.findOne({username:req.body.username});
+
+        if (!foundUser) {
+            res.render("auth/signin.hbs", {
+              errorMessage: "Bad credentials",
+            });
+            return;
+          }
+
+        const isValidPassword = bcrypt.compareSync(req.body.password, foundUser.password);
+
+        if (isValidPassword) {
+            req.session.currentUser = {_id:foundUser._id,};
+            res.redirect("/users/profile");
+
+        }
+        else{
+            res.render("auth/signin.hbs", {
+                errorMessage: "Bad credentials",
+              });
+              return;
+        }
+
+    }
+    catch (error) {
+        next(error);
+      }
+});
+
 
 
 module.exports = router;
